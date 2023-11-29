@@ -1,0 +1,25 @@
+syntax = "proto3";
+package test.pb;
+
+import "vector.proto";
+
+option go_package = "protoc-gen-cmdid/examples/protos";
+
+message SearchRequest {
+  string query = 1;
+  int32 page_number = 2;
+  int32 results_per_page = 3;
+}
+
+message SearchResponse {
+  message NestedData {
+    int32 num = 1;
+  }
+
+  Vector3 position = 1;
+  Vector3 scale = 2;
+  int32 count = 3;
+  string name = 4;
+  int32 ret_code = 5;
+  NestedData data = 6;
+}
