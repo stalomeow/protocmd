@@ -33,7 +33,7 @@ func genGo(req *pluginpb.CodeGeneratorRequest, config *cmdIdConfig) (*pluginpb.C
 			continue
 		}
 
-		fileName := f.GeneratedFilenamePrefix + ".cmdid.go"
+		fileName := f.GeneratedFilenamePrefix + ".cmd.go"
 		g := plugin.NewGeneratedFile(fileName, f.GoImportPath)
 
 		// Header

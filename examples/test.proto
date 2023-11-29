@@ -4,6 +4,7 @@ package test.pb;
 import "vector.proto";
 
 option go_package = "protoc-gen-cmdid/examples/protos";
+option csharp_namespace = "Test.Protos";
 
 message SearchRequest {
   string query = 1;

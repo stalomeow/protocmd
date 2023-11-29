@@ -1,0 +1,1 @@
+protoc --go_out=../../ --cmdid_out=../../ --cmdid_opt=lang=go,go_cmd_import_path="protoc-gen-cmdid/examples/cmd" test.proto vector.proto -I=.
