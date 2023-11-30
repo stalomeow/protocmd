@@ -1,7 +1,7 @@
 syntax = "proto3";
 package test.pb;
 
-option go_package = "protoc-gen-cmdid/examples/protos";
+option go_package = "github.com/stalomeow/protocmd/examples/protos";
 option csharp_namespace = "Test.Protos";
 
 message Vector3 {

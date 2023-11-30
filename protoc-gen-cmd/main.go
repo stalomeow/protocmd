@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/pluginpb"
@@ -8,8 +9,6 @@ import (
 	"os"
 	"path/filepath"
 )
-
-const Version = "1.0.0"
 
 func main() {
 	if err := run(); err != nil {
@@ -50,20 +49,23 @@ func run() error {
 }
 
 func response(req *pluginpb.CodeGeneratorRequest) (*pluginpb.CodeGeneratorResponse, error) {
-	config, err := loadCmdIdConfig(req.GetParameter())
+	context := generateContext{}
+	err := context.init(req)
 	if err != nil {
 		return nil, err
 	}
 
-	if lang, ok := config.args["lang"]; ok {
-		delete(config.args, "lang")
-
-		switch lang {
-		case "csharp":
-			return genCSharp(req, config)
-		case "go":
-			return genGo(req, config)
+	if lang, ok := context.popArg("lang"); ok {
+		generator, err := getGeneratorByLang(lang)
+		if err != nil {
+			return nil, err
 		}
+
+		err = generator.generate(&context)
+		if err != nil {
+			return nil, err
+		}
+		return context.rsp, nil
 	}
-	return nil, fmt.Errorf("unknown languge")
+	return nil, errors.New("lang is not specified")
 }

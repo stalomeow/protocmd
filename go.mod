@@ -1,4 +1,4 @@
-module protoc-gen-cmdid
+module github.com/stalomeow/protocmd
 
 go 1.21
 

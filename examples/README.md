@@ -1,1 +1,1 @@
-protoc --go_out=../../ --cmdid_out=../../ --cmdid_opt=lang=go,go_cmd_import_path="protoc-gen-cmdid/examples/cmd" test.proto vector.proto -I=.
+protoc --go_out=. --go_opt=module=github.com/stalomeow/protocmd/examples --cmd_out=. --cmd_opt=lang=go,module=github.com/stalomeow/protocmd/examples test.proto vector.proto -I=.
