@@ -12,6 +12,7 @@ type csharpGenerator struct {
 	allTypeFullNames []string
 	baseNamespace    string
 	hasBaseNamespace bool
+	autoInit         bool
 	initClassName    string
 	initClassNs      string
 }
@@ -29,6 +30,7 @@ func (gen *csharpGenerator) initGenerator(context *generateContext) error {
 	gen.baseNamespace, gen.hasBaseNamespace = context.popArg("base_namespace")
 
 	flags := flag.FlagSet{}
+	flags.BoolVar(&gen.autoInit, "auto_init", true, "")
 	flags.StringVar(&gen.initClassName, "init_class_name", "CmdMessageLoader", "")
 	if gen.hasBaseNamespace {
 		flags.StringVar(&gen.initClassNs, "init_class_ns", gen.baseNamespace, "")
@@ -153,11 +155,20 @@ func (gen *csharpGenerator) writeInitClass(context *generateContext) error {
 		gf.indent(1)
 	}
 
-	gf.println("internal static partial class ", gen.initClassName)
+	if gen.autoInit {
+		gf.println("internal static partial class ", gen.initClassName)
+	} else {
+		gf.println("public static partial class ", gen.initClassName)
+	}
 	gf.println("{")
 	gf.indent(1)
-	gf.println("[UnityEngine.RuntimeInitializeOnLoadMethod]")
-	gf.println("private static void InitCmdMessages()")
+
+	if gen.autoInit {
+		gf.println("[UnityEngine.RuntimeInitializeOnLoadMethod]")
+		gf.println("private static void InitCmdMessages()")
+	} else {
+		gf.println("public static void InitCmdMessages()")
+	}
 	gf.println("{")
 	gf.indent(1)
 
