@@ -173,7 +173,7 @@ func (gen *csharpGenerator) writeInitClass(context *generateContext) error {
 	gf.indent(1)
 
 	for _, t := range gen.allTypeFullNames {
-		gf.println("pb::CmdMessageUtility.RegisterCmd(", t, ".CmdId, ", t, ".CmdName, ", t, ".Parser);")
+		gf.println("pb::CmdMessageManager.RegisterCmd(", t, ".CmdId, ", t, ".CmdName, ", t, ".Parser);")
 	}
 
 	gf.indent(-1)
