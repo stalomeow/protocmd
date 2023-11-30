@@ -17,8 +17,8 @@ message SearchResponse {
     int32 num = 1;
   }
 
-  Vector3 position = 1;
-  Vector3 scale = 2;
+  test.pb.math.Vector3 position = 1;
+  test.pb.math.Vector3 scale = 2;
   int32 count = 3;
   string name = 4;
   int32 ret_code = 5;

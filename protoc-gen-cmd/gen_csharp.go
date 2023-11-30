@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"path"
 	"strings"
@@ -9,6 +10,8 @@ import (
 
 type csharpGenerator struct {
 	allTypeFullNames []string
+	baseNamespace    string
+	hasBaseNamespace bool
 	initClassName    string
 	initClassNs      string
 }
@@ -23,10 +26,15 @@ func (*csharpGenerator) langName() string {
 
 func (gen *csharpGenerator) initGenerator(context *generateContext) error {
 	gen.allTypeFullNames = make([]string, 0)
+	gen.baseNamespace, gen.hasBaseNamespace = context.popArg("base_namespace")
 
 	flags := flag.FlagSet{}
 	flags.StringVar(&gen.initClassName, "init_class_name", "CmdMessageLoader", "")
-	flags.StringVar(&gen.initClassNs, "init_class_ns", "", "")
+	if gen.hasBaseNamespace {
+		flags.StringVar(&gen.initClassNs, "init_class_ns", gen.baseNamespace, "")
+	} else {
+		flags.StringVar(&gen.initClassNs, "init_class_ns", "", "")
+	}
 	return context.writeArgsToFlagSet(&flags)
 }
 
@@ -66,12 +74,15 @@ func (gen *csharpGenerator) generate(context *generateContext) error {
 			gf.println("}")
 		}
 
-		filename := getCSharpFileNameWithoutExt(f)
+		filename, err := gen.convertToCSharpFileNameWithoutExt(ns, f.Path())
+		if err != nil {
+			return err
+		}
 		context.addGenFile(filename+".cmd.cs", &gf)
 	}
 
-	gen.writeInitClass(context)
-	return nil
+	err = gen.writeInitClass(context)
+	return err
 }
 
 func (*csharpGenerator) writeFileHeader(srcFile protoreflect.FileDescriptor, gf *genFile) {
@@ -126,9 +137,9 @@ func (gen *csharpGenerator) writeMsg(context *generateContext, messages protoref
 	}
 }
 
-func (gen *csharpGenerator) writeInitClass(context *generateContext) {
+func (gen *csharpGenerator) writeInitClass(context *generateContext) error {
 	if len(gen.allTypeFullNames) <= 0 {
-		return
+		return nil
 	}
 
 	gf := genFile{}
@@ -164,13 +175,42 @@ func (gen *csharpGenerator) writeInitClass(context *generateContext) {
 		gf.println("}")
 	}
 
-	context.addGenFile(gen.initClassName+".cs", &gf)
+	filename, err := gen.convertToCSharpFileNameWithoutExt(gen.initClassNs, gen.initClassName)
+	if err != nil {
+		return err
+	}
+	context.addGenFile(filename+".cs", &gf)
+	return nil
 }
 
-func getCSharpFileNameWithoutExt(desc protoreflect.FileDescriptor) string {
-	filename := desc.Path()
+func (gen *csharpGenerator) convertToCSharpFileNameWithoutExt(ns string, filename string) (string, error) {
 	filename = strings.TrimSuffix(filename, path.Ext(filename))
-	return underscoresToCamelCase(filename, true, true)
+	filename = underscoresToCamelCase(filename, true, true)
+
+	if !gen.hasBaseNamespace {
+		return filename, nil
+	}
+
+	nsSuffix := ns
+
+	if gen.baseNamespace != "" {
+		// Check that the base_namespace is either equal to or a leading part of
+		// the file namespace. This isn't just a simple prefix; "Foo.B" shouldn't
+		// be regarded as a prefix of "Foo.Bar". The simplest option is to add "."
+		// to both.
+		suffix, found := strings.CutPrefix(ns, gen.baseNamespace)
+		if !found || (suffix != "" && !strings.HasPrefix(suffix, ".")) {
+			return "", fmt.Errorf("namespace %s does not have base namespace %s", ns, gen.baseNamespace)
+		}
+
+		if suffix == "" {
+			nsSuffix = suffix
+		} else {
+			nsSuffix = suffix[1:] // trim leading period
+		}
+	}
+
+	return path.Join(strings.ReplaceAll(nsSuffix, ".", "/"), filename), nil
 }
 
 func getCSharpFileNamespace(desc protoreflect.FileDescriptor) string {

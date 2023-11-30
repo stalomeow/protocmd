@@ -1,8 +1,8 @@
 syntax = "proto3";
-package test.pb;
+package test.pb.math;
 
-option go_package = "github.com/stalomeow/protocmd/examples/protos";
-option csharp_namespace = "Test.Protos";
+option go_package = "github.com/stalomeow/protocmd/examples/protos/math";
+option csharp_namespace = "Test.Protos.Math";
 
 message Vector3 {
   float x = 1;

@@ -1,0 +1,8 @@
+syntax = "proto3";
+package test.pb.ss;
+
+option csharp_namespace="Test.Protos.SS";
+
+message ABC {
+  int32 num = 1;
+}

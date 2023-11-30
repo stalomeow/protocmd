@@ -4,4 +4,4 @@ test.pb.SearchResponse: 2
 test.pb.SearchResponse.NestedData: 3
 
 # 101 - 400
-test.pb.math.Vector: 300
+test.pb.math.Vector3: 300
