@@ -156,6 +156,7 @@ func (gen *csharpGenerator) writeInitClass(context *generateContext) error {
 	}
 
 	if gen.autoInit {
+		gf.println("[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]")
 		gf.println("internal static partial class ", gen.initClassName)
 	} else {
 		gf.println("public static partial class ", gen.initClassName)
