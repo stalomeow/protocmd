@@ -116,11 +116,11 @@ func (gen *csharpGenerator) writeMsg(context *generateContext, messages protoref
 		gf.println("partial class ", cmdName, " : pb::ICmdMessage")
 		gf.println("{")
 		gf.indent(1)
-		gf.println("public static ushort CmdId => ", cmdId, ";")
-		gf.println("ushort pb::ICmdMessage.CmdId => ", cmdId, ";")
+		gf.println("public static ushort CmdId { get { return ", cmdId, "; } }")
+		gf.println("ushort pb::ICmdMessage.CmdId { get { return ", cmdId, "; } }")
 		gf.println()
-		gf.println("public static string CmdName => \"", cmdName, "\";")
-		gf.println("string pb::ICmdMessage.CmdName => \"", cmdName, "\";")
+		gf.println("public static string CmdName { get { return \"", cmdName, "\"; } }")
+		gf.println("string pb::ICmdMessage.CmdName { get { return \"", cmdName, "\"; } }")
 
 		if nestedMessages := msg.Messages(); nestedMessages.Len() > 0 {
 			gf.println()
