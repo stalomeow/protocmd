@@ -123,12 +123,16 @@ type langGenerator interface {
 var langMap = make(map[string]reflect.Type)
 
 func registerLangGenerator(gen langGenerator) {
-	langMap[gen.langName()] = reflect.TypeOf(gen).Elem()
+	langMap[gen.langName()] = reflect.TypeOf(gen)
 }
 
 func getGeneratorByLang(langName string) (langGenerator, error) {
 	if t, ok := langMap[langName]; ok {
-		return reflect.New(t).Interface().(langGenerator), nil
+		if t.Kind() == reflect.Pointer {
+			return reflect.New(t.Elem()).Interface().(langGenerator), nil
+		} else {
+			return reflect.New(t).Elem().Interface().(langGenerator), nil
+		}
 	}
 	return nil, fmt.Errorf("lang '%s' was not registered", langName)
 }
