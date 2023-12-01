@@ -77,36 +77,36 @@ protoc --cmd_out=unity --cmd_opt=lang=csharp,base_namespace=Examples.CSharp prot
 package main
 
 import (
-	"fmt"
-	"github.com/stalomeow/protocmd"
-	"github.com/stalomeow/protocmd/examples/go/protos" // load all generated protos
-	"google.golang.org/protobuf/proto"
+    "fmt"
+    "github.com/stalomeow/protocmd"
+    "github.com/stalomeow/protocmd/examples/go/protos" // load all generated protos
+    "google.golang.org/protobuf/proto"
 )
 
 func main() {
-	cmdId := protos.TestReq_CmdId
+    cmdId := protos.TestReq_CmdId
 
-	buf, err := proto.Marshal(&protos.TestReq{Uid: "123321"})
-	if err != nil {
-		fmt.Printf("Error %v", err)
-		return
-	}
+    buf, err := proto.Marshal(&protos.TestReq{Uid: "123321"})
+    if err != nil {
+        fmt.Printf("Error %v", err)
+        return
+    }
 
-	// Create message by cmdId
-	msg, err := protocmd.NewMessageByCmdId(cmdId)
-	if err != nil {
-		fmt.Printf("Error %v", err)
-		return
-	}
-	err = proto.Unmarshal(buf, msg)
-	if err != nil {
-		fmt.Printf("Error %v", err)
-		return
-	}
+    // Create message by cmdId
+    msg, err := protocmd.NewMessageByCmdId(cmdId)
+    if err != nil {
+        fmt.Printf("Error %v", err)
+        return
+    }
+    err = proto.Unmarshal(buf, msg)
+    if err != nil {
+        fmt.Printf("Error %v", err)
+        return
+    }
 
-	// Get cmdId and name
-	fmt.Printf("Cmd (id: %v, name: %s)\n", msg.CmdId(), msg.CmdName())
-	fmt.Println(msg.(*protos.TestReq))
+    // Get cmdId and name
+    fmt.Printf("Cmd (id: %v, name: %s)\n", msg.CmdId(), msg.CmdName())
+    fmt.Println(msg.(*protos.TestReq))
 }
 ```
 
@@ -126,11 +126,11 @@ public class Example : MonoBehaviour
     {
         byte[] bytes = new TestReq() { Uid = "123321" }.ToByteArray();
 
-		// Create message by cmdId
+        // Create message by cmdId
         MessageParser parser = Helpers.GetMessageParserByCmdId(TestReq.CmdId);
         ICmdMessage msg = parser.ParseFrom(bytes) as ICmdMessage;
 
-		// Get cmdId and name
+        // Get cmdId and name
         print(msg.CmdId);
         print(msg.CmdName);
         print((TestReq)msg);
