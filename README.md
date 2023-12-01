@@ -1,8 +1,6 @@
 # protocmd
 
-This project provides an easy way to manage a mapping between uint16 ids (a.k.a. CmdId/MsgId) and protobuf Messages. A typical use is encoding and decoding binary network packet.
-
-Currently, only support Go and Unity (C#).
+This project provides an easy way to manage a mapping between uint16 ids (CmdId/MsgId) and protobuf Messages, primarily used for encoding and decoding binary network packets. Currently, it supports Go and Unity (C#).
 
 This project is comprised of two components:
 
@@ -22,7 +20,7 @@ go get github.com/stalomeow/protocmd
 
 ### Configuration
 
-Create a yaml file to configure the mapping between messages and ids.
+Create a YAML file to configure the mapping between messages and ids.
 
 ``` yaml
 # format:
@@ -59,7 +57,7 @@ Options:
 - `config`: The configuration file name. The default value is `cmd.yaml`.
 - [`base_namespace`](https://protobuf.dev/reference/csharp/csharp-generated/#compiler_options): When this option is specified, the generator creates a directory hierarchy for generated source code corresponding to the namespaces of the generated classes, using the value of the option to indicate which part of the namespace should be considered as the "base" for the output directory.
 - `msg_helpers_name`: The name of a generated class (`msg_helpers`) holding all messages that have cmdIds. The default value is `MessageHelpers`.
-- `msg_helpers_ns`: The namespace of `msg_helpers`. If `base_namespace` is specified, the default value is `base_namespace` otherwise empty.
+- `msg_helpers_ns`: The namespace of `msg_helpers`. If `base_namespace` is specified, the default value is `base_namespace`; otherwise, it is empty.
 
 Example:
 
