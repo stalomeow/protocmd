@@ -12,7 +12,7 @@ The runtime library for Unity is [github.com/stalomeow/Protobuf-Unity](https://g
 
 ## Code Generation
 
-## Installation
+### Installation
 
 ```
 go install github.com/stalomeow/protocmd/protoc-gen-cmd@latest
