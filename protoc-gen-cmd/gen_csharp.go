@@ -9,12 +9,11 @@ import (
 )
 
 type csharpGenerator struct {
-	allTypeFullNames []string
-	baseNamespace    string
-	hasBaseNamespace bool
-	autoInit         bool
-	initClassName    string
-	initClassNs      string
+	allTypeFullNames    []string
+	baseNamespace       string
+	hasBaseNamespace    bool
+	msgHelpersClassName string
+	msgHelpersClassNs   string
 }
 
 func init() {
@@ -30,12 +29,11 @@ func (gen *csharpGenerator) initGenerator(context *generateContext) error {
 	gen.baseNamespace, gen.hasBaseNamespace = context.popArg("base_namespace")
 
 	flags := flag.FlagSet{}
-	flags.BoolVar(&gen.autoInit, "auto_init", true, "")
-	flags.StringVar(&gen.initClassName, "init_class_name", "CmdMessageLoader", "")
+	flags.StringVar(&gen.msgHelpersClassName, "msg_helpers_name", "MessageHelpers", "")
 	if gen.hasBaseNamespace {
-		flags.StringVar(&gen.initClassNs, "init_class_ns", gen.baseNamespace, "")
+		flags.StringVar(&gen.msgHelpersClassNs, "msg_helpers_ns", gen.baseNamespace, "")
 	} else {
-		flags.StringVar(&gen.initClassNs, "init_class_ns", "", "")
+		flags.StringVar(&gen.msgHelpersClassNs, "msg_helpers_ns", "", "")
 	}
 	return context.writeArgsToFlagSet(&flags)
 }
@@ -83,7 +81,7 @@ func (gen *csharpGenerator) generate(context *generateContext) error {
 		context.addGenFile(filename+".cmd.cs", &gf)
 	}
 
-	err = gen.writeInitClass(context)
+	err = gen.writeMsgHelpersClass(context)
 	return err
 }
 
@@ -139,7 +137,7 @@ func (gen *csharpGenerator) writeMsg(context *generateContext, messages protoref
 	}
 }
 
-func (gen *csharpGenerator) writeInitClass(context *generateContext) error {
+func (gen *csharpGenerator) writeMsgHelpersClass(context *generateContext) error {
 	if len(gen.allTypeFullNames) <= 0 {
 		return nil
 	}
@@ -149,32 +147,22 @@ func (gen *csharpGenerator) writeInitClass(context *generateContext) error {
 	gf.println("using pb = global::Google.Protobuf;")
 	gf.println()
 
-	if gen.initClassNs != "" {
-		gf.println("namespace ", gen.initClassNs)
+	if gen.msgHelpersClassNs != "" {
+		gf.println("namespace ", gen.msgHelpersClassNs)
 		gf.println("{")
 		gf.indent(1)
 	}
 
-	if gen.autoInit {
-		gf.println("[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]")
-		gf.println("internal static partial class ", gen.initClassName)
-	} else {
-		gf.println("public static partial class ", gen.initClassName)
-	}
+	gf.println("public partial class ", gen.msgHelpersClassName, " : pb::BaseMessageHelpers")
 	gf.println("{")
 	gf.indent(1)
 
-	if gen.autoInit {
-		gf.println("[UnityEngine.RuntimeInitializeOnLoadMethod]")
-		gf.println("private static void InitCmdMessages()")
-	} else {
-		gf.println("public static void InitCmdMessages()")
-	}
+	gf.println("public ", gen.msgHelpersClassName, "()")
 	gf.println("{")
 	gf.indent(1)
 
 	for _, t := range gen.allTypeFullNames {
-		gf.println("pb::CmdMessageManager.RegisterCmd(", t, ".CmdId, ", t, ".CmdName, ", t, ".Parser);")
+		gf.println("this.Register(", t, ".CmdId, ", t, ".CmdName, ", t, ".Parser, () => ", t, ".Descriptor);")
 	}
 
 	gf.indent(-1)
@@ -182,12 +170,12 @@ func (gen *csharpGenerator) writeInitClass(context *generateContext) error {
 	gf.indent(-1)
 	gf.println("}")
 
-	if gen.initClassNs != "" {
+	if gen.msgHelpersClassNs != "" {
 		gf.indent(-1)
 		gf.println("}")
 	}
 
-	filename, err := gen.convertToCSharpFileNameWithoutExt(gen.initClassNs, gen.initClassName)
+	filename, err := gen.convertToCSharpFileNameWithoutExt(gen.msgHelpersClassNs, gen.msgHelpersClassName)
 	if err != nil {
 		return err
 	}

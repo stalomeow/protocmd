@@ -1,7 +1,7 @@
-# 1 - 100
-test.pb.SearchRequest: 1
-test.pb.SearchResponse: 2
-test.pb.SearchResponse.NestedData: 3
+# First Group
+protocmd.examples.TestReq: 1010
+protocmd.examples.TestRsp: 1011
 
-# 101 - 400
-test.pb.math.Vector3: 300
+# Second Group
+protocmd.examples.TestRsp.TransformInfo: 2010
+# protocmd.examples.Vector3: 2055

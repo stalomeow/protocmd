@@ -1,0 +1,22 @@
+syntax = "proto3";
+package protocmd.examples;
+
+option go_package = "github.com/stalomeow/protocmd/examples/go/protos";
+option csharp_namespace = "Examples.CSharp.Protos";
+
+import "vector.proto";
+
+message TestReq {
+  string uid = 1;
+}
+
+message TestRsp {
+  message TransformInfo {
+    Vector3 position = 1;
+    Vector3 eulerAngles = 2;
+    Vector3 scale = 3;
+  }
+
+  int32 ret_code = 1;
+  repeated TransformInfo transforms = 6;
+}

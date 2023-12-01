@@ -3,6 +3,7 @@ package protocmd
 import (
 	"fmt"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
 type CmdMessage interface {
@@ -12,66 +13,64 @@ type CmdMessage interface {
 }
 
 type cmdInfo struct {
-	name    string
-	factory func() CmdMessage
+	name       string
+	factory    func() CmdMessage
+	descriptor protoreflect.MessageDescriptor
 }
 
-var cmdMap = make(map[uint16]*cmdInfo)
-var cmdMapDup = make(map[uint16]interface{})
+var cmdInfoMap = make(map[uint16]*cmdInfo)
+var cmdIdMap = make(map[string]uint16)
 
 func Register(factory func() CmdMessage) {
 	msg := factory()
 	cmdId := msg.CmdId()
 
-	if _, ok := cmdMap[cmdId]; ok {
-		cmdMapDup[cmdId] = nil
-	}
-
-	cmdMap[cmdId] = &cmdInfo{
-		name:    msg.CmdName(),
-		factory: factory,
+	cmdInfoMap[cmdId] = &cmdInfo{
+		name:       msg.CmdName(),
+		factory:    factory,
+		descriptor: msg.ProtoReflect().Descriptor(),
 	}
 }
 
-func Unregister(cmdId uint16) {
-	delete(cmdMap, cmdId)
-	delete(cmdMapDup, cmdId)
-}
-
-func New(cmdId uint16) (CmdMessage, error) {
-	info, ok := cmdMap[cmdId]
+func NewMessageByCmdId(cmdId uint16) (CmdMessage, error) {
+	info, ok := cmdInfoMap[cmdId]
 	if !ok {
-		return nil, fmt.Errorf("failed to new cmd with id '%v' which was not registered", cmdId)
+		return nil, fmt.Errorf("failed to new Message with cmdId '%v' which was not registered", cmdId)
 	}
 	return info.factory(), nil
 }
 
-func Count() int {
-	return len(cmdMap)
+func MessageDescriptorByCmdId(cmdId uint16) (protoreflect.MessageDescriptor, error) {
+	info, ok := cmdInfoMap[cmdId]
+	if !ok {
+		return nil, fmt.Errorf("failed to get MessageDescriptor with cmdId '%v' which was not registered", cmdId)
+	}
+	return info.descriptor, nil
 }
 
-func HasDuplicated() bool {
-	return len(cmdMapDup) > 0
+func CmdCount() int {
+	return len(cmdInfoMap)
 }
 
-func DuplicatedCmdIds() []uint16 {
-	keys := make([]uint16, len(cmdMapDup))
+func AllCmdIds() []uint16 {
+	ids := make([]uint16, len(cmdInfoMap))
 	i := 0
-	for k := range cmdMapDup {
-		keys[i] = k
+	for k := range cmdInfoMap {
+		ids[i] = k
 		i++
 	}
-	return keys
+	return ids
 }
 
-func Name(cmdId uint16) string {
-	return NameOrDefault(cmdId, "<UnknownCmd>")
-}
-
-func NameOrDefault(cmdId uint16, defaultName string) string {
-	info, ok := cmdMap[cmdId]
+func CmdName(cmdId uint16) (string, bool) {
+	info, ok := cmdInfoMap[cmdId]
 	if !ok {
-		return defaultName
+		return "", false
 	}
-	return info.name
+	return info.name, true
+}
+
+func CmdId(cmdName string) (uint16, bool) {
+	cmdId, ok := cmdIdMap[cmdName]
+	return cmdId, ok
 }

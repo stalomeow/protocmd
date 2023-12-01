@@ -1,0 +1,11 @@
+syntax = "proto3";
+package protocmd.examples;
+
+option go_package = "github.com/stalomeow/protocmd/examples/go/protos";
+option csharp_namespace = "Examples.CSharp.Protos";
+
+message Vector3 {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
