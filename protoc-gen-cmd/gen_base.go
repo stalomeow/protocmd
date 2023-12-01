@@ -63,7 +63,20 @@ func loadYamlConfig(context *generateContext) error {
 		return err
 	}
 	context.config.CmdIdMap = make(map[string]uint16)
-	return yaml.Unmarshal(buf, &context.config.CmdIdMap)
+	err = yaml.Unmarshal(buf, &context.config.CmdIdMap)
+	if err != nil {
+		return err
+	}
+
+	// Find duplicated cmdId
+	ids := make(map[uint16]interface{})
+	for _, v := range context.config.CmdIdMap {
+		if _, ok := ids[v]; ok {
+			return fmt.Errorf("duplicated cmdId %v", v)
+		}
+		ids[v] = nil
+	}
+	return nil
 }
 
 func (context *generateContext) popArg(key string) (string, bool) {
