@@ -3,7 +3,7 @@
 Directories and files:
 
 - `go`: Go example.
-- `protos`: Protobuf source code.
+- `protos`: Proto source files.
 - `unity`: Unity example.
 - `cmd.yaml`: The configuration file.
 
