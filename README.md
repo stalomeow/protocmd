@@ -10,13 +10,13 @@ This project is comprised of two components:
 
 The runtime library for Unity is [github.com/stalomeow/Protobuf-Unity](https://github.com/stalomeow/Protobuf-Unity).
 
+## Code Generation
+
 ## Installation
 
 ```
-go get github.com/stalomeow/protocmd
+go install github.com/stalomeow/protocmd/protoc-gen-cmd@latest
 ```
-
-## Code Generation
 
 ### Configuration
 
@@ -71,6 +71,10 @@ protoc --cmd_out=unity --cmd_opt=lang=csharp,base_namespace=Examples.CSharp prot
 
 ### Go
 
+```
+go get github.com/stalomeow/protocmd/protoc-gen-cmd
+```
+
 ``` go
 package main
 
@@ -109,6 +113,8 @@ func main() {
 ```
 
 ### Unity
+
+Import [github.com/stalomeow/Protobuf-Unity](https://github.com/stalomeow/Protobuf-Unity) package.
 
 ``` c#
 using Examples.CSharp.Protos;
